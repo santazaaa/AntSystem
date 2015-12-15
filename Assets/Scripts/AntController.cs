@@ -6,115 +6,51 @@ public class AntController : MonoBehaviour {
 
 	private GameManager gameManager ;
 
-	private NavMeshAgent ant;
-	public NodesController nodes ;
+	private NavMeshAgent navMeshAgent;
+	private LogicManager logicManager ;
 
-	public List <int> previousNodes = new List<int>();
-	public int previousNode;
-	public int nextNode; 
+    private List<Node> previousNodes;
+	private Node currentNode;
 
-	public Vector3 destination;
-	public float distance;
-
-	Vector3 nextPosition;
-
-	//public bool running;
-	public double ran;
-
+	private float totalDistance;
 
 	void Awake()
 	{
-		//Make NodesController Instance
-		nodes = NodesController.Instance;
-		gameManager = GameManager.Instance;
+        previousNodes = new List<Node>();
 
 	}
 
 	// Use this for initialization
 	void Start () {
-	//	running = true;
-		previousNode = 0;
-		previousNodes.Add (previousNode);
-		ant = GetComponent<NavMeshAgent>();
-		getNextPos ();
-		}
+        logicManager = LogicManager.Instance;
+        gameManager = GameManager.Instance;
+
+  		navMeshAgent = GetComponent<NavMeshAgent>();
+
+	}
 	
 	// Update is called once per frame
 	void Update () {
 			
-		//if Ant arrive at destination
-		distance = Vector3.Distance (this.transform.localPosition ,  nextPosition);
-		if (distance <= 0.15f || distance == 0 ) {
-			//running = false;
-			//nodes.pheromoneDecay(previousNode,nextNode);
-			previousNode = nextNode;
-			if(!previousNodes.Contains(previousNode))previousNodes.Add (previousNode);
-			getNextPos ();
+        if (navMeshAgent.remainingDistance <= 0.15f) // Reach destination
+        {
+            if(currentNode.getNodeId() == 0 && previousNodes.Capacity > 1)
+            {
+                // Come back home, reset statistic
+                logicManager.pheromoneDecay(previousNodes);
+                previousNodes.Clear();
+                totalDistance = 0;
+            }
+			if(!previousNodes.Contains(currentNode))previousNodes.Add (currentNode);
+            Node nextNode = logicManager.getNextNode(previousNodes, currentNode);
+            currentNode = nextNode;
+            moveTo(nextNode.getPosition());
 		}
 
-		//Move
-		move ();
-		//if(ran==0)this.StartSinking ();
-
-
-
-	}
-
-	//algorithm of Any System here
-	void getNextPos(){
-
-		//Initializing Variables
-		int n = nodes.node_numbers;
-		float []  prob = new float[n];
-		int alpha = nodes.alpha;
-		int beta = nodes.beta;
-
-		//Ant System Formula
-
-		//calculate the probability by find the product of T^a and n^b and store prob array
-		float sum = 0.0f;
-		for(int i = 0; i < n ; i++) {
-			if (i == previousNode || previousNodes.Contains(i)) {
-				prob [i] = 0.0f;
-			} else {
-
-
-				double t = nodes.pheromonesMatrices [previousNode, i];
-				double u;
-
-				u = (double)(1 / nodes.distanceMatrices [previousNode, i]);
-				float p = Mathf.Pow ((float)t, alpha) * Mathf.Pow ((float)u, beta);
-				prob [i] = p;
-				sum += p;
-			}
-		}
-
-		//cumulative all the result in array... if you want to know why? just ask me. 
-		float prev = 0.0f;
-		for(int i = 0; i < n ; i++) {
-			
-			float temp = prob[i];
-			prob[i] += prev;
-			prev = temp;
-		}
-
-		//random the number and find the next Node
-		ran = Random.Range(0.0f,sum);
-		for(int i = 0; i < n ; i++){
-			if(i!=previousNode &&  !previousNodes.Contains(i)){
-				if (ran <= prob [i]) {
-					nextNode = i;
-					nextPosition = nodes.nodesList [i].transform.localPosition;
-					//running = true;
-					break;
-				}
-			}
-		}
 	}
 		
-	void move(){
-		ant.SetDestination (nodes.nodesList[nextNode].transform.localPosition);
-	//	destination = nodes.nodesList [nextNode].transform.localPosition;
+	void moveTo(Vector3 targetPos){
+		navMeshAgent.SetDestination (targetPos);
 	}
 
 

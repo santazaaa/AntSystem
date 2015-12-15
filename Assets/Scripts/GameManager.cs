@@ -1,22 +1,28 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour {
 
-	public NodesController nodes ;
-	public GameObject node;
-	public GameObject Ant;
+    [HideInInspector]
+    private List<List<Path>> pathList;
+    [HideInInspector]
+    private List<Node> nodeList;
 
-	public float gameTime;
+	private LogicManager logicManager;
+	public GameObject nodePrefab;
+    public GameObject antPrefab;
+    public GameObject pathPrefab;
+
 	public int numberAnt;
 	public int maxAnt;
 	public int maxNode;
 
-	public Vector3 [] Holes = new Vector3[2];
+	public Node holeNode;
 
 	[HideInInspector]
 	public static GameManager Instance
-	{ 
+	{
 		get
 		{
 			return _instance;
@@ -30,11 +36,16 @@ public class GameManager : MonoBehaviour {
 	void Awake()
 	{
 		_instance = this;
+        pathList = new List<List<Path>>();
+        nodeList = new List<Node>();
 	}
 
 	// Use this for initialization
 	void Start () {
 		numberAnt = 0;
+        logicManager = LogicManager.Instance;
+        nodeList.Add(holeNode);
+        pathList.Add(new List<Path>());
 	}
 	
 	// Update is called once per frame
@@ -74,10 +85,8 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public void spawnNode(Vector3 position){
-		GameObject newNode = Instantiate (node,position,Quaternion.identity) as GameObject;
-		nodes.addNode (newNode);
-		Debug.Log ("pikachu");
-
+		GameObject newNode = Instantiate (nodePrefab,position,Quaternion.identity) as GameObject;
+        addNode(newNode.GetComponent<Node>());
 	}
 
 	public void spawnAnt(){
@@ -86,5 +95,47 @@ public class GameManager : MonoBehaviour {
 		CancelInvoke ();
 	}
 
+    public void addNode(Node node)
+    {
+        nodeList.Add(node);
+        List<Path> newPaths = new List<Path>();
+        pathList.Add(newPaths);
 
+        int nodeListSize = nodeList.Capacity;
+        node.setNodeId(nodeListSize - 1);
+        for (int i = 0; i < nodeListSize - 1; i++)
+        {
+            Node nodeI = getNode(i);
+            GameObject pathObj = Instantiate(pathPrefab, (node.getPosition() + nodeI.getPosition()) / 2, Quaternion.identity);
+            Path path = pathObj.GetComponent<Path>();
+            path.setDistance(Vector3.Distance(node.getPosition(), nodeI.getPosition()));
+            path.setPheromone(1);
+            newPaths.Add(path);
+        }
+    }
+
+    public Path getPath(int i, int j)
+    {
+        if (i < j)
+        {
+            return pathList[j][i];
+        }
+        return pathList[i][j];
+    }
+
+    public Path getPath(Node node1, Node node2)
+    {
+        return getPath(node1.getNodeId(), node2.getNodeId());
+    }
+
+    public Node getNode(int id)
+    {
+        if (id >= nodeList.Capacity) Debug.LogError("No node id = " + id);
+        return nodeList[id];
+    }
+
+    public int getNodeListSize()
+    {
+        return nodeList.Capacity;
+    }
 }
