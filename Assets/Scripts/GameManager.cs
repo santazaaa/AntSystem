@@ -8,17 +8,21 @@ public class GameManager : MonoBehaviour {
     private List<List<Path>> pathList;
     [HideInInspector]
     private List<Node> nodeList;
+    [HideInInspector]
+    private List<AntController> antList;
 
 	private LogicManager logicManager;
 	public GameObject nodePrefab;
     public GameObject antPrefab;
     public GameObject pathPrefab;
 
-	public int numberAnt;
 	public int maxAnt;
 	public int maxNode;
+    public float antSpawnDelay;
 
 	public Node holeNode;
+
+    private float elapsedTime;
 
 	[HideInInspector]
 	public static GameManager Instance
@@ -38,36 +42,31 @@ public class GameManager : MonoBehaviour {
 		_instance = this;
         pathList = new List<List<Path>>();
         nodeList = new List<Node>();
-	}
+        antList = new List<AntController>();
+        elapsedTime = 0;
+    }
 
 	// Use this for initialization
 	void Start () {
-		numberAnt = 0;
         logicManager = LogicManager.Instance;
         nodeList.Add(holeNode);
+        holeNode.setNodeId(0);
         pathList.Add(new List<Path>());
 	}
 	
 	// Update is called once per frame
 	void Update () {
-	
-		//Set Start Point and Destination Point for ants ...actually this is useless and pointless lol 
-		if (nodes.node_numbers == 2) {
-				Holes [0] = nodes.nodesList [0].transform.localPosition;
-				Holes [1] = nodes.nodesList [1].transform.localPosition;
-			}
 
 		//if there are more than two holes, spawn the ants
-		if (nodes.node_numbers >= 2) {
-			if (numberAnt <= maxAnt - 1) {
-				InvokeRepeating("spawnAnt", 0.5f, 0.5f); 
-			}
+		if (elapsedTime >= antSpawnDelay && getNodeListSize() >= 2 && antList.Count < maxAnt) {
+            spawnAnt();
+            elapsedTime = 0;
 		}
 
 		//check amount of nodes on screen
-		if(nodes.node_numbers<=maxNode)OnClick ();
+		if(getNodeListSize() < maxNode) OnClick ();
 
-		gameTime += Time.deltaTime;
+		elapsedTime += Time.deltaTime;
 	}
 
 
@@ -84,15 +83,17 @@ public class GameManager : MonoBehaviour {
 		}
 	}
 
+    public void spawnAnt()
+    {
+        GameObject newAnt = Instantiate(antPrefab, holeNode.getPosition(), Quaternion.identity) as GameObject;
+        AntController antCtrl = newAnt.GetComponent<AntController>();
+        antCtrl.setCurrentNode(holeNode);
+        antList.Add(antCtrl);
+    }
+
 	public void spawnNode(Vector3 position){
 		GameObject newNode = Instantiate (nodePrefab,position,Quaternion.identity) as GameObject;
         addNode(newNode.GetComponent<Node>());
-	}
-
-	public void spawnAnt(){
-		GameObject newAnt = Instantiate (Ant,Holes[0],Quaternion.identity) as GameObject;
-		numberAnt++;
-		CancelInvoke ();
 	}
 
     public void addNode(Node node)
@@ -101,12 +102,12 @@ public class GameManager : MonoBehaviour {
         List<Path> newPaths = new List<Path>();
         pathList.Add(newPaths);
 
-        int nodeListSize = nodeList.Capacity;
+        int nodeListSize = nodeList.Count;
         node.setNodeId(nodeListSize - 1);
         for (int i = 0; i < nodeListSize - 1; i++)
         {
             Node nodeI = getNode(i);
-            GameObject pathObj = Instantiate(pathPrefab, (node.getPosition() + nodeI.getPosition()) / 2, Quaternion.identity);
+            GameObject pathObj = Instantiate(pathPrefab, (node.getPosition() + nodeI.getPosition()) / 2, Quaternion.identity) as GameObject;
             Path path = pathObj.GetComponent<Path>();
             path.setDistance(Vector3.Distance(node.getPosition(), nodeI.getPosition()));
             path.setPheromone(1);
@@ -130,12 +131,12 @@ public class GameManager : MonoBehaviour {
 
     public Node getNode(int id)
     {
-        if (id >= nodeList.Capacity) Debug.LogError("No node id = " + id);
+        if (id >= nodeList.Count) Debug.LogError("No node id = " + id);
         return nodeList[id];
     }
 
     public int getNodeListSize()
     {
-        return nodeList.Capacity;
+        return nodeList.Count;
     }
 }

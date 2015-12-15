@@ -47,15 +47,17 @@ public class LogicManager : MonoBehaviour {
     public void pheromoneDecay(List<Node> nodeList)
     {
         float distance = getTotalDistance(nodeList);
-        for (int i = 0; i < gameManager.getNodeListSize(); i++)
+        for (int i = 0; i < nodeList.Count - 1; i++)
         {
-            for (int j = 0; j < i; j++)
-            {
-                float deltaT = getPheromoneUpdate(distance);
-                Path path = gameManager.getPath(i, j);
-                float temp = (1 - rho) * path.getPheromone() + deltaT;
-                path.setPheromone(temp);
-            }
+            Node nodeI = nodeList[i];
+            Node nodeJ = nodeList[i + 1];
+            
+            float deltaT = getPheromoneUpdate(distance);
+                
+            Path path = gameManager.getPath(nodeI.getNodeId(), nodeJ.getNodeId());
+            float temp = (1 - rho) * path.getPheromone() + deltaT;
+            Debug.Log("Delta T = " + deltaT + "New P of path " + nodeI.getNodeId() + " " + nodeJ.getNodeId() + " = " + temp);
+            path.setPheromone(temp);
         }
     }
 
@@ -63,9 +65,10 @@ public class LogicManager : MonoBehaviour {
     {
         int nodeListSize = gameManager.getNodeListSize();
 
-        if (prevNodes.Capacity >= gameManager.getNodeListSize()) return prevNodes[0];
+        if (prevNodes.Count >= gameManager.getNodeListSize()) return prevNodes[0];
 
         float[] prob = new float[nodeListSize];
+        float sum = 0.0f;
         for (int i = 0; i < nodeListSize; i++)
         {
             Node tempNode = gameManager.getNode(i);
@@ -77,12 +80,13 @@ public class LogicManager : MonoBehaviour {
             {
                 float p = getPathProb(gameManager.getPath(currentNode.getNodeId(), i));
                 prob[i] = p;
+                sum += p;
             }
         }
 
         // Random prob with cumulative prob
-        float sum = 0.0f;
-        float rand = Random.Range(0.0f, 1.0f);
+        float rand = Random.Range(0.0f, sum);
+        sum = 0;
         for(int i = 0; i < prob.Length; i++)
         {
             sum += prob[i];
@@ -104,7 +108,7 @@ public class LogicManager : MonoBehaviour {
     public float getTotalDistance(List<Node> nodeList)
     {
         float totalDistance = 0;
-        int nodeListSize = nodeList.Capacity;
+        int nodeListSize = nodeList.Count;
         for(int i = 0; i < nodeListSize - 1; i++)
         {
             totalDistance += gameManager.getPath(nodeList[i], nodeList[i+1]).getDistance();

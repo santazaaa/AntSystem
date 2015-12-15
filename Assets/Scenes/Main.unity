@@ -2450,52 +2450,6 @@ MeshFilter:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 703135103}
   m_Mesh: {fileID: 4300000, guid: 1b0f8caf6ec3ed644bf9751040d84dcb, type: 3}
---- !u!1 &707929643
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 4
-  m_Component:
-  - 4: {fileID: 707929645}
-  - 114: {fileID: 707929644}
-  m_Layer: 0
-  m_Name: nodes
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &707929644
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 707929643}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3ec74394e9af5164fb86b73906cdc03e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  nodesList: []
-  gameTime: 0
-  node_numbers: 0
-  alpha: 2
-  beta: 5
-  p: 0.5
-  Q: 0.5
---- !u!4 &707929645
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 707929643}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 1
 --- !u!1 &755016965
 GameObject:
   m_ObjectHideFlags: 0
@@ -2504,6 +2458,7 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 755016966}
+  - 114: {fileID: 755016967}
   m_Layer: 0
   m_Name: Hole
   m_TagString: Untagged
@@ -2518,13 +2473,24 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 755016965}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -15.59, y: 0, z: 10.5}
+  m_LocalPosition: {x: -10.2, y: 0, z: 20.7}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1420290722}
   - {fileID: 398021211}
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 1
+--- !u!114 &755016967
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 755016965}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b220b3637162d043b14479610fb0a29, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &793527816
 GameObject:
   m_ObjectHideFlags: 0
@@ -4043,6 +4009,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 1370583975}
   - 114: {fileID: 1370583974}
+  - 114: {fileID: 1370583976}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -4061,16 +4028,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 487c4ea94675f954a8cffa09cf1b6263, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  nodes: {fileID: 707929644}
-  node: {fileID: 185814, guid: dc40fad9832bca340ae56d81d6e9fd56, type: 2}
-  Ant: {fileID: 153582, guid: 890111d3da4c8cd4ca30ae7f5d8a72e1, type: 2}
-  gameTime: 0
-  numberAnt: 0
-  maxAnt: 5
+  nodePrefab: {fileID: 185814, guid: dc40fad9832bca340ae56d81d6e9fd56, type: 2}
+  antPrefab: {fileID: 153582, guid: 890111d3da4c8cd4ca30ae7f5d8a72e1, type: 2}
+  pathPrefab: {fileID: 142504, guid: 133ba80639aa3674887bf6ac19a54243, type: 2}
+  maxAnt: 8
   maxNode: 20
-  Holes:
-  - {x: 0, y: 0, z: 0}
-  - {x: 0, y: 0, z: 0}
+  antSpawnDelay: 0.5
+  holeNode: {fileID: 755016967}
 --- !u!4 &1370583975
 Transform:
   m_ObjectHideFlags: 0
@@ -4082,7 +4046,22 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 3
+--- !u!114 &1370583976
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1370583973}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c46f11d2880b50419ec3c55e3bddf53, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  alpha: 3
+  beta: 3
+  rho: 0.2
+  Q: 0.5
 --- !u!1 &1381839710
 GameObject:
   m_ObjectHideFlags: 0
@@ -5381,7 +5360,7 @@ Transform:
   - {fileID: 1384420524}
   - {fileID: 69375783}
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 4
 --- !u!1 &1652266674
 GameObject:
   m_ObjectHideFlags: 0
@@ -6697,7 +6676,7 @@ RectTransform:
   m_Children:
   - {fileID: 1727358054}
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}

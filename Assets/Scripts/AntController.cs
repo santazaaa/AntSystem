@@ -10,9 +10,7 @@ public class AntController : MonoBehaviour {
 	private LogicManager logicManager ;
 
     private List<Node> previousNodes;
-	private Node currentNode;
-
-	private float totalDistance;
+    private Node currentNode;
 
 	void Awake()
 	{
@@ -26,22 +24,21 @@ public class AntController : MonoBehaviour {
         gameManager = GameManager.Instance;
 
   		navMeshAgent = GetComponent<NavMeshAgent>();
-
 	}
 	
 	// Update is called once per frame
 	void Update () {
-			
-        if (navMeshAgent.remainingDistance <= 0.15f) // Reach destination
+
+        if (Vector3.Distance(transform.position, navMeshAgent.destination) <= 1.5f)  // Reach destination
         {
-            if(currentNode.getNodeId() == 0 && previousNodes.Capacity > 1)
+            navMeshAgent.velocity = Vector3.zero;
+            if(currentNode.getNodeId() == 0 && previousNodes.Count > 1)
             {
                 // Come back home, reset statistic
                 logicManager.pheromoneDecay(previousNodes);
                 previousNodes.Clear();
-                totalDistance = 0;
             }
-			if(!previousNodes.Contains(currentNode))previousNodes.Add (currentNode);
+			previousNodes.Add (currentNode);
             Node nextNode = logicManager.getNextNode(previousNodes, currentNode);
             currentNode = nextNode;
             moveTo(nextNode.getPosition());
@@ -65,5 +62,10 @@ public class AntController : MonoBehaviour {
 
 		gameManager.numberAnt--;*/
 	}
+
+    public void setCurrentNode(Node node)
+    {
+        currentNode = node;
+    }
 
 }
