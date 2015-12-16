@@ -12,10 +12,13 @@ public class AntController : MonoBehaviour {
     private List<Node> previousNodes;
     private Node currentNode;
 
+    [HideInInspector]
+    public bool isWaiting;
+
 	void Awake()
 	{
         previousNodes = new List<Node>();
-
+        isWaiting = false;
 	}
 
 	// Use this for initialization
@@ -28,15 +31,16 @@ public class AntController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-
+        if (isWaiting) return;
         if (Vector3.Distance(transform.position, navMeshAgent.destination) <= 5f)  // Reach destination
         {
             navMeshAgent.velocity = Vector3.zero;
             if(currentNode.getNodeId() == 0 && previousNodes.Count > 1)
-            {
-                // Come back home, reset statistic
-                logicManager.pheromoneDecay(previousNodes);
-                previousNodes.Clear();
+            {                
+                isWaiting = true;
+                GameManager.Instance.reachHome();
+                LogicManager.Instance.addDeltaPheromoneToPaths(previousNodes);
+                return;
             }
 			previousNodes.Add (currentNode);
             Node nextNode = logicManager.getNextNode(previousNodes, currentNode);
@@ -66,6 +70,16 @@ public class AntController : MonoBehaviour {
     public void setCurrentNode(Node node)
     {
         currentNode = node;
+    }
+
+    public Node getCurrentNode()
+    {
+        return currentNode;
+    }
+
+    public List<Node> getPrevNodes()
+    {
+        return previousNodes;
     }
 
 }

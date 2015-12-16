@@ -5,6 +5,7 @@ public class Path : MonoBehaviour {
 
     private float distance;
     private float pheromone;
+    private float deltaPheromone;
     private LineRenderer lineRenderer;
 
     void Awake()
@@ -36,7 +37,7 @@ public class Path : MonoBehaviour {
 
     public void setDistance(float _distance)
     {
-        this.distance = _distance;
+        this.distance = 100 * _distance;
     }
 
     public float getPheromone()
@@ -54,4 +55,16 @@ public class Path : MonoBehaviour {
         Color tmp = lineRenderer.material.GetColor("_Color");
         lineRenderer.material.SetColor("_Color", new Color(tmp.r, tmp.g, tmp.b, alpha));
     }
+
+    public void addDeltaPheromone(float amount)
+    {
+        deltaPheromone += amount;
+    }
+
+    public void updatePheromone(float rho)
+    {
+        pheromone = pheromone * (1.0f - rho) + deltaPheromone;
+        deltaPheromone = 0;
+    }
+
 }

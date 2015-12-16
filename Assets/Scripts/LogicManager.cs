@@ -65,6 +65,23 @@ public class LogicManager : MonoBehaviour {
         return Q / distance;
     }
 
+    public void addDeltaPheromoneToPaths(List<Node> prevNodes)
+    {
+        float distance = getTotalDistance(prevNodes);
+        // Add delta T to tour path only
+        for (int i = 0; i < prevNodes.Count - 1; i++)
+        {
+            Node nodeI = prevNodes[i];
+            Node nodeJ = prevNodes[i + 1];
+
+            float deltaT = getPheromoneUpdate(distance);
+
+            Path path = gameManager.getPath(nodeI.getNodeId(), nodeJ.getNodeId());
+
+            path.addDeltaPheromone(deltaT);
+        }
+    }
+
     public void pheromoneDecay(List<Node> nodeList)
     {
         float distance = getTotalDistance(nodeList);
@@ -104,45 +121,65 @@ public class LogicManager : MonoBehaviour {
 
         if (prevNodes.Count >= gameManager.getNodeListSize())return prevNodes[0];
 
-        float[] prob = new float[nodeListSize];
-        float sum = 0.0f;
-        List<Path> paths = new List<Path>();
+        List<Node> possibleNodes = new List<Node>();
 
         for (int i = 0; i < nodeListSize; i++)
         {
             Node tempNode = gameManager.getNode(i);
-            if (prevNodes.Contains(tempNode) || i == currentNode.getNodeId())
+            if(!prevNodes.Contains(tempNode) && tempNode.getNodeId() != currentNode.getNodeId())
             {
-                prob[i] = 0.0f;
-            }
-            else
-            {
-                Path path = gameManager.getPath(currentNode.getNodeId(), i);
-                float p = getPathProb(path);
-                prob[i] = p;
-                sum += p;
-                paths.Add(path);
+                possibleNodes.Add(tempNode);
             }
         }
 
-        for (int i = 0; i < paths.Count; i++)
+        // Back to home case
+        if (possibleNodes.Count == 0) return prevNodes[0];
+
+        // There are possible paths left
+
+        // Calculate probability of each path
+        List<float> probs = new List<float>();
+        List<Path> paths = new List<Path>();
+        float sum = 0;
+        foreach (Node destNode in possibleNodes)
         {
-            Path path = paths[i];
-            // Update line alpha with prob
-            path.setLineAlpha(getPathProb(path) / sum);
+            Path path = gameManager.getPath(currentNode, destNode);
+            paths.Add(path);
+
+            float p = getPathProb(path);
+            probs.Add(p);
+
+            sum += p;
+        }
+        
+        if(sum < 0.00000001f) // Too close to zero
+        {
+            int rnd = Random.Range(0, possibleNodes.Count);
+            for(int i = 0; i < paths.Count; i++)
+            {
+                Path path = paths[i];
+            }
+            return possibleNodes[rnd];
         }
 
-        // Random prob with cumulative prob
-        float rand = Random.Range(0.0f, sum);
-        sum = 0;
-        for(int i = 0; i < prob.Length; i++)
-        {
-            sum += prob[i];
-            if (rand <= sum) return gameManager.getNode(i);
-        }
+        float rndF = Random.Range(0.0f, 1.0f);
+        float cumuSum = 0;
+        Node retNode = currentNode;
+        bool foundNode = false;
 
-        Debug.Log("No next node for nodeId = " + currentNode.getNodeId());
-        return currentNode;
+        for (int i = 0; i < possibleNodes.Count; i++ )
+        {
+            float p = probs[i] / sum;
+            cumuSum += p;
+            if (!foundNode & rndF < cumuSum)
+            {
+                retNode = possibleNodes[i];
+                foundNode = true;
+            }
+            paths[i].setLineAlpha(p);
+
+        }
+        return retNode;
     }
 
     public float getPathProb(Path path)

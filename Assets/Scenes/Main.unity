@@ -3883,6 +3883,7 @@ MonoBehaviour:
   speedUp: 10
   antNumber: 0
   holeNode: {fileID: 755016967}
+  antAtHomeCount: 0
 --- !u!4 &1370583975
 Transform:
   m_ObjectHideFlags: 0
