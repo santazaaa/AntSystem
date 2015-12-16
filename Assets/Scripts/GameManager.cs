@@ -20,7 +20,7 @@ public class GameManager : MonoBehaviour {
 	public int maxNode;
     public float antSpawnDelay;
 
-    public float speedUp = 1;
+    public float speedUp;
     public int antNumber;
 
 	public Node holeNode;
@@ -47,6 +47,7 @@ public class GameManager : MonoBehaviour {
         nodeList = new List<Node>();
         antList = new List<AntController>();
         elapsedTime = 0;
+		speedUp = 1;
     }
 
 	// Use this for initialization

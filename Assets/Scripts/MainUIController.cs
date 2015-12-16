@@ -109,6 +109,8 @@ public class MainUIController : MonoBehaviour {
         LogicManager.Instance.alpha = alphaSlider.value;
         LogicManager.Instance.beta = betaSlider.value;
         LogicManager.Instance.Q = QSlider.value;
+		BGMusicControl.Instance.updateSoundSpeed ();
+
     }
 
     public void OnClearClick()
