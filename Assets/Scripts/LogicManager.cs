@@ -6,10 +6,15 @@ public class LogicManager : MonoBehaviour {
 
     private GameManager gameManager;
 
-    public int alpha;
-    public int beta;
+    public float alpha;
+    public float beta;
     public float rho;
     public float Q;
+
+    public float maxAlpha = 20;
+    public float maxBeta = 20;
+    public float maxRho = 1;
+    public float maxQ = 50;
 
     private float currentMaxPheromone;
 
@@ -40,6 +45,19 @@ public class LogicManager : MonoBehaviour {
 	void Update () {
 	
 	}
+
+    public void ResetPheromone()
+    {
+        for(int i = 0; i < gameManager.getNodeListSize(); i++)
+        {
+            for(int j = 0; j < i; j++)
+            {
+                Path path = gameManager.getPath(i, j);
+                path.setPheromone(1 / path.getDistance());
+                path.setLineAlpha(0);
+            }
+        }
+    }
 
     public float getPheromoneUpdate(float distance)
     {

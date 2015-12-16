@@ -26,24 +26,44 @@ public class MainUIController : MonoBehaviour {
     public Slider betaSlider;
 
     // timescale
-    public Text timeScaleValueText;
-    public Slider timeScaleSlider;
+    public Text QValueText;
+    public Slider QSlider;
 
     // apply
     public Button applyButton;
 
     // Top panels
-    // pause & resume
-    public Button pauseButton;
-    public Button resumeButton;
-
     // reset & start
     public Button resetButton;
-    public Button startButton;
+    public Button clearButton;
 
 	// Use this for initialization
 	void Start () {
 	    // Set min, max value
+        antSpeedSlider.minValue = 0;
+        antSpeedSlider.maxValue = 15;
+        antSpeedSlider.value = 1;
+
+        antNumberSlider.minValue = 0;
+        antNumberSlider.maxValue = GameManager.Instance.maxAnt;
+        antNumberSlider.value = Mathf.Min(3, GameManager.Instance.maxAnt);
+
+        rhoSlider.minValue = 0;
+        rhoSlider.maxValue = LogicManager.Instance.maxRho;
+        rhoSlider.value = 0.2f;
+
+        alphaSlider.minValue = 0;
+        alphaSlider.maxValue = LogicManager.Instance.maxAlpha;
+        alphaSlider.value = 1;
+
+        betaSlider.minValue = 0;
+        betaSlider.maxValue = LogicManager.Instance.maxBeta;
+        betaSlider.value = 1;
+
+        QSlider.minValue = 1;
+        QSlider.maxValue = LogicManager.Instance.maxQ;
+        QSlider.value = 1;
+        
 	}
 	
 	// Update is called once per frame
@@ -58,7 +78,7 @@ public class MainUIController : MonoBehaviour {
 
     public void OnAntNumberValueChange()
     {
-        antNumberValueText.text = antNumberSlider.value.ToString();
+        antNumberValueText.text = ((int)antNumberSlider.value).ToString();
     }
 
     public void OnRhoValueChange()
@@ -76,34 +96,29 @@ public class MainUIController : MonoBehaviour {
         betaValueText.text = betaSlider.value.ToString();
     }
 
-    public void OnTimeScaleValueChange()
+    public void OnQValueChange()
     {
-        timeScaleValueText.text = timeScaleSlider.value.ToString();
+        QValueText.text = QSlider.value.ToString();
     }
 
     public void OnApplyClick()
     {
-
+        GameManager.Instance.speedUp = antSpeedSlider.value;
+        GameManager.Instance.setAntNumber((int)antNumberSlider.value);
+        LogicManager.Instance.rho = rhoSlider.value;
+        LogicManager.Instance.alpha = alphaSlider.value;
+        LogicManager.Instance.beta = betaSlider.value;
+        LogicManager.Instance.Q = QSlider.value;
     }
 
-    public void OnStartClick()
+    public void OnClearClick()
     {
-
+        GameManager.Instance.clearAll();
     }
 
     public void OnResetClick()
     {
-
-    }
-
-    public void OnPauseClick()
-    {
-
-    }
-
-    public void OnResumeClick()
-    {
-
+        GameManager.Instance.ResetAnt();
     }
 
 }

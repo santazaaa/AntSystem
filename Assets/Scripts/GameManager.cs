@@ -19,7 +19,9 @@ public class GameManager : MonoBehaviour {
 	public int maxAnt;
 	public int maxNode;
     public float antSpawnDelay;
+
     public float speedUp = 1;
+    public int antNumber;
 
 	public Node holeNode;
 
@@ -59,7 +61,8 @@ public class GameManager : MonoBehaviour {
 	void Update () {
         Time.timeScale = speedUp;
 		//if there are more than two holes, spawn the ants
-		if (elapsedTime >= antSpawnDelay && getNodeListSize() >= 2 && antList.Count < maxAnt) {
+        if (elapsedTime >= antSpawnDelay && getNodeListSize() >= 2 && antList.Count < antNumber)
+        {
             spawnAnt();
             elapsedTime = 0;
 		}
@@ -73,16 +76,73 @@ public class GameManager : MonoBehaviour {
 
 	public void OnClick()
 	{
-		//click to spawn node
-		if (Input.GetMouseButtonDown(0)) {
-			RaycastHit hit;
-			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-			if (Physics.Raycast (ray, out hit))
-			if (hit.collider != null)
-				spawnNode (hit.point);
+        #if (UNITY_ANDROID || UNITY_IOS) && !UNITY_EDITOR
+                if(Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began && !UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject(Input.GetTouch(0).fingerId))
+                {
+                        Vector3 mousePos = Input.mousePosition;
+                        PlayerController.Instance.OnTouch(mousePos);
+                }
+        #else
+                if (Input.GetMouseButtonDown(0))
+                {
+                    if (!UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject()) // Pointer is not over UIs
+                    {
+                        Vector3 mousePos = Input.mousePosition;
+                        //click to spawn node
+                        RaycastHit hit;
+                        Ray ray = Camera.main.ScreenPointToRay(mousePos);
+                        if (Physics.Raycast(ray, out hit))
+                            if (hit.collider != null)
+                                spawnNode(hit.point);
 
-		}
+                    }
+                }
+        #endif
+
+		
 	}
+
+    public void clearAll()
+    {
+        removeAnt(antList.Count);
+        for(int i = 0; i < pathList.Count; i++)
+        {
+            List<Path> paths = pathList[i];
+            for (int j = paths.Count - 1; j >= 0; j--)
+            {
+                Path p = paths[j];
+                paths.RemoveAt(j);
+                Destroy(p.gameObject);
+            }
+        }
+        pathList.Clear();
+        for(int i = nodeList.Count - 1; i >= 0; i--)
+        {
+            Node node = nodeList[i];
+            if (node.getNodeId() == 0) continue;
+            nodeList.RemoveAt(i);
+            Destroy(node.gameObject);
+        }
+        // Initialize new value
+        pathList.Add(new List<Path>());
+        elapsedTime = 0;
+        antNumber = 0;
+    }
+    
+    public void setAntNumber(int number)
+    {
+        if (antList.Count == number) return;
+        if(antList.Count < number)
+        {
+            antNumber = number;
+        }
+        else
+        {
+            Debug.Log("Remove ants " + (antList.Count - number));
+            removeAnt(antList.Count - number);
+            antNumber = number;
+        }
+    }
 
     public void spawnAnt()
     {
@@ -90,6 +150,22 @@ public class GameManager : MonoBehaviour {
         AntController antCtrl = newAnt.GetComponent<AntController>();
         antCtrl.setCurrentNode(holeNode);
         antList.Add(antCtrl);
+    }
+
+    public void removeAnt(int number)
+    {
+        if(antList.Count >= number)
+        {
+            int count = 0;
+            for(int i = antList.Count - 1; count < number && i >= 0; i--)
+            {
+                count++;
+                
+                AntController antCtrl = antList[i];
+                antList.RemoveAt(i);
+                Destroy(antCtrl.gameObject);
+            }
+        }
     }
 
 	public void spawnNode(Vector3 position){
@@ -116,6 +192,12 @@ public class GameManager : MonoBehaviour {
             path.setPheromone(1 / distance);
             newPaths.Add(path);
         }
+    }
+
+    public void ResetAnt()
+    {
+        removeAnt(antList.Count);
+        logicManager.ResetPheromone();
     }
 
     public Path getPath(int i, int j)
