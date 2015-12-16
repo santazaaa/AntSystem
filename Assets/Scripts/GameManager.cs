@@ -199,7 +199,7 @@ public class GameManager : MonoBehaviour {
                 
                 AntController antCtrl = antList[i];
                 antList.RemoveAt(i);
-                if (antCtrl.getCurrentNode().getNodeId() == 0) antAtHomeCount--;
+                if (antCtrl.isWaiting) antAtHomeCount--;
                 Destroy(antCtrl.gameObject);
             }
         }

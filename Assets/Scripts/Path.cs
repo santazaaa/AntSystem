@@ -37,7 +37,7 @@ public class Path : MonoBehaviour {
 
     public void setDistance(float _distance)
     {
-        this.distance = _distance;
+        this.distance = 100 * _distance;
     }
 
     public float getPheromone()
