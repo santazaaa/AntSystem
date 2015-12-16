@@ -113,10 +113,16 @@ public class GameManager : MonoBehaviour {
                 if(Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began && !UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject(Input.GetTouch(0).fingerId))
                 {
                         Vector3 mousePos = Input.mousePosition;
-                        PlayerController.Instance.OnTouch(mousePos);
+                        //click to spawn node
+                        RaycastHit hit;
+                        Ray ray = Camera.main.ScreenPointToRay(mousePos);
+                        if (Physics.Raycast(ray, out hit))
+                            if (hit.collider != null)
+                                spawnNode(hit.point);
+
                 }
-        #else
-                if (Input.GetMouseButtonDown(0))
+#else
+        if (Input.GetMouseButtonDown(0))
                 {
                     if (!UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject()) // Pointer is not over UIs
                     {
