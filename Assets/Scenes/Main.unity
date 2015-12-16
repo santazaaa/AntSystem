@@ -845,51 +845,51 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 22442532, guid: a1f594da4ff98f844ab04b712234b061, type: 2}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 22440936, guid: a1f594da4ff98f844ab04b712234b061, type: 2}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 22492826, guid: a1f594da4ff98f844ab04b712234b061, type: 2}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 22473056, guid: a1f594da4ff98f844ab04b712234b061, type: 2}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 22459306, guid: a1f594da4ff98f844ab04b712234b061, type: 2}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 22473582, guid: a1f594da4ff98f844ab04b712234b061, type: 2}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 22405076, guid: a1f594da4ff98f844ab04b712234b061, type: 2}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 22491288, guid: a1f594da4ff98f844ab04b712234b061, type: 2}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 22436078, guid: a1f594da4ff98f844ab04b712234b061, type: 2}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 22441550, guid: a1f594da4ff98f844ab04b712234b061, type: 2}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 22431532, guid: a1f594da4ff98f844ab04b712234b061, type: 2}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 22491998, guid: a1f594da4ff98f844ab04b712234b061, type: 2}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: a1f594da4ff98f844ab04b712234b061, type: 2}
@@ -3910,10 +3910,10 @@ MonoBehaviour:
   beta: 7
   rho: 0.2
   Q: 0.1
-  maxAlpha: 20
-  maxBeta: 20
+  maxAlpha: 10
+  maxBeta: 10
   maxRho: 1
-  maxQ: 50
+  maxQ: 10
 --- !u!1 &1381839710
 GameObject:
   m_ObjectHideFlags: 0
