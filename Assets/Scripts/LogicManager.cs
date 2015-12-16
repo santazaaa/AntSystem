@@ -11,6 +11,8 @@ public class LogicManager : MonoBehaviour {
     public float rho;
     public float Q;
 
+    private float currentMaxPheromone;
+
     [HideInInspector]
     public static LogicManager Instance
     {
@@ -25,6 +27,7 @@ public class LogicManager : MonoBehaviour {
     void Awake()
     {
         _instance = this;
+        currentMaxPheromone = 0;
     }
 
 	// Use this for initialization
@@ -47,28 +50,46 @@ public class LogicManager : MonoBehaviour {
     public void pheromoneDecay(List<Node> nodeList)
     {
         float distance = getTotalDistance(nodeList);
+        int allNSize = gameManager.getNodeListSize();;
+
+        // Decay pheromone in all path with rho
+        for (int i = 0; i < allNSize - 1; i++)
+        {
+            for(int j = 0; j < i; j++)
+            {
+                Path path = gameManager.getPath(i, j);
+                path.setPheromone((1 - rho) * path.getPheromone());
+            }
+        }
+
+        // Add delta T to tour path only
         for (int i = 0; i < nodeList.Count - 1; i++)
         {
             Node nodeI = nodeList[i];
             Node nodeJ = nodeList[i + 1];
-            
+
             float deltaT = getPheromoneUpdate(distance);
-                
+
             Path path = gameManager.getPath(nodeI.getNodeId(), nodeJ.getNodeId());
-            float temp = (1 - rho) * path.getPheromone() + deltaT;
-            Debug.Log("Delta T = " + deltaT + "New P of path " + nodeI.getNodeId() + " " + nodeJ.getNodeId() + " = " + temp);
-            path.setPheromone(temp);
+           
+            path.setPheromone(path.getPheromone() + deltaT);
+
+            Debug.Log("Delta T = " + deltaT + " New P of path " + nodeI.getNodeId() + " " + nodeJ.getNodeId() + " = " + path.getPheromone());
         }
+
+        //gameManager.updatePheromoneLine();
     }
 
     public Node getNextNode(List<Node> prevNodes, Node currentNode)
     {
         int nodeListSize = gameManager.getNodeListSize();
 
-        if (prevNodes.Count >= gameManager.getNodeListSize()) return prevNodes[0];
+        if (prevNodes.Count >= gameManager.getNodeListSize())return prevNodes[0];
 
         float[] prob = new float[nodeListSize];
         float sum = 0.0f;
+        List<Path> paths = new List<Path>();
+
         for (int i = 0; i < nodeListSize; i++)
         {
             Node tempNode = gameManager.getNode(i);
@@ -78,10 +99,19 @@ public class LogicManager : MonoBehaviour {
             }
             else
             {
-                float p = getPathProb(gameManager.getPath(currentNode.getNodeId(), i));
+                Path path = gameManager.getPath(currentNode.getNodeId(), i);
+                float p = getPathProb(path);
                 prob[i] = p;
                 sum += p;
+                paths.Add(path);
             }
+        }
+
+        for (int i = 0; i < paths.Count; i++)
+        {
+            Path path = paths[i];
+            // Update line alpha with prob
+            path.setLineAlpha(getPathProb(path) / sum);
         }
 
         // Random prob with cumulative prob

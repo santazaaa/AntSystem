@@ -29,7 +29,7 @@ public class AntController : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
-        if (Vector3.Distance(transform.position, navMeshAgent.destination) <= 1.5f)  // Reach destination
+        if (Vector3.Distance(transform.position, navMeshAgent.destination) <= 5f)  // Reach destination
         {
             navMeshAgent.velocity = Vector3.zero;
             if(currentNode.getNodeId() == 0 && previousNodes.Count > 1)

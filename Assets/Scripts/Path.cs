@@ -5,16 +5,29 @@ public class Path : MonoBehaviour {
 
     private float distance;
     private float pheromone;
-    private GameObject particle;
+    private LineRenderer lineRenderer;
+
+    void Awake()
+    {
+        lineRenderer = GetComponent<LineRenderer>();
+    }
 
 	// Use this for initialization
 	void Start () {
+        //lineRenderer.material = new Material (Shader.Find("Particles/Additive"));
 	}
 	
 	// Update is called once per frame
 	void Update () {
 	
 	}
+
+    public void setPosition(Vector3 startPos, Vector3 endPos)
+    {
+        lineRenderer.SetVertexCount(2);
+        lineRenderer.SetPosition(0, startPos);
+        lineRenderer.SetPosition(1, endPos);
+    }
 
     public float getDistance()
     {
@@ -34,5 +47,11 @@ public class Path : MonoBehaviour {
     public void setPheromone(float _pheromone)
     {
         this.pheromone = _pheromone;
+    }
+
+    public void setLineAlpha(float alpha)
+    {
+        Color tmp = lineRenderer.material.GetColor("_Color");
+        lineRenderer.material.SetColor("_Color", new Color(tmp.r, tmp.g, tmp.b, alpha));
     }
 }

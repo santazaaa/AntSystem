@@ -19,6 +19,7 @@ public class GameManager : MonoBehaviour {
 	public int maxAnt;
 	public int maxNode;
     public float antSpawnDelay;
+    public float speedUp = 1;
 
 	public Node holeNode;
 
@@ -56,7 +57,7 @@ public class GameManager : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-
+        Time.timeScale = speedUp;
 		//if there are more than two holes, spawn the ants
 		if (elapsedTime >= antSpawnDelay && getNodeListSize() >= 2 && antList.Count < maxAnt) {
             spawnAnt();
@@ -109,8 +110,10 @@ public class GameManager : MonoBehaviour {
             Node nodeI = getNode(i);
             GameObject pathObj = Instantiate(pathPrefab, (node.getPosition() + nodeI.getPosition()) / 2, Quaternion.identity) as GameObject;
             Path path = pathObj.GetComponent<Path>();
-            path.setDistance(Vector3.Distance(node.getPosition(), nodeI.getPosition()));
-            path.setPheromone(1);
+            float distance = Vector3.Distance(node.getPosition(), nodeI.getPosition());
+            path.setDistance(distance);
+            path.setPosition(node.getPosition(), nodeI.getPosition());
+            path.setPheromone(1 / distance);
             newPaths.Add(path);
         }
     }
@@ -138,5 +141,28 @@ public class GameManager : MonoBehaviour {
     public int getNodeListSize()
     {
         return nodeList.Count;
+    }
+
+    public void updatePheromoneLine()
+    {
+        float maxPheromone = 0;
+        for (int i = 0; i < pathList.Count; i++)
+        {
+            for (int j = 0; j < pathList[i].Count; j++)
+            {
+                //if (logicManager.getPathProb(pathList[i][j]) > maxPheromone)
+                    maxPheromone += logicManager.getPathProb(pathList[i][j]);
+            }
+        }
+
+        if (maxPheromone < 1e-4) return;
+
+        for (int i = 0; i < pathList.Count; i++)
+        {
+            for (int j = 0; j < pathList[i].Count; j++)
+            {
+                pathList[i][j].setLineAlpha(logicManager.getPathProb(pathList[i][j]) / maxPheromone);
+            }
+        }
     }
 }
