@@ -75,7 +75,8 @@ public class GameManager : MonoBehaviour {
 		//check amount of nodes on screen
 		if(getNodeListSize() < maxNode) OnClick ();
 
-        if (getNodeListSize() >= 2)
+        Debug.Log("Current ants at home " + antAtHomeCount);
+        if (getNodeListSize() >= 2 && antAtHomeCount > 0)
         {
             if(antAtHomeCount == antList.Count) // All ants are at home
             {
@@ -91,6 +92,7 @@ public class GameManager : MonoBehaviour {
                 // Let ants freeeeee!
                 foreach(AntController ant in antList)
                 {
+                    if (!ant.isWaiting) continue;
                     ant.getPrevNodes().Clear();
                     ant.setCurrentNode(holeNode);
                     ant.isWaiting = false;
@@ -179,15 +181,16 @@ public class GameManager : MonoBehaviour {
     public void reachHome()
     {
         antAtHomeCount++;
+        Debug.Log("Reachhome = " + antAtHomeCount);
     }
 
     public void spawnAnt()
     {
         GameObject newAnt = Instantiate(antPrefab, holeNode.getPosition(), Quaternion.identity) as GameObject;
         AntController antCtrl = newAnt.GetComponent<AntController>();
+        antCtrl.isWaiting = false;
         antCtrl.setCurrentNode(holeNode);
         antList.Add(antCtrl);
-        antAtHomeCount++;
     }
 
     public void removeAnt(int number)
@@ -237,6 +240,7 @@ public class GameManager : MonoBehaviour {
     {
         removeAnt(antList.Count);
         logicManager.ResetPheromone();
+        antAtHomeCount = 0;
     }
 
     public Path getPath(int i, int j)

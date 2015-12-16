@@ -35,6 +35,7 @@ public class AntController : MonoBehaviour {
         if (Vector3.Distance(transform.position, navMeshAgent.destination) <= 5f)  // Reach destination
         {
             navMeshAgent.velocity = Vector3.zero;
+            navMeshAgent.ResetPath();
             if(currentNode.getNodeId() == 0 && previousNodes.Count > 1)
             {                
                 isWaiting = true;
