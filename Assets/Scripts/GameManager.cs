@@ -27,6 +27,9 @@ public class GameManager : MonoBehaviour {
 
     private float elapsedTime;
 
+    [HideInInspector]
+    public int antAtHomeCount;
+
 	[HideInInspector]
 	public static GameManager Instance
 	{
@@ -47,6 +50,7 @@ public class GameManager : MonoBehaviour {
         nodeList = new List<Node>();
         antList = new List<AntController>();
         elapsedTime = 0;
+        antAtHomeCount = 0;
     }
 
 	// Use this for initialization
@@ -69,6 +73,32 @@ public class GameManager : MonoBehaviour {
 
 		//check amount of nodes on screen
 		if(getNodeListSize() < maxNode) OnClick ();
+
+        if (getNodeListSize() >= 2)
+        {
+            if(antAtHomeCount == antList.Count) // All ants are at home
+            {
+                // Update pheromone
+                foreach(List<Path> paths in pathList)
+                {
+                    foreach(Path path in paths)
+                    {
+                        path.updatePheromone(LogicManager.Instance.rho);
+                    }
+                    
+                }
+                // Let ants freeeeee!
+                foreach(AntController ant in antList)
+                {
+                    ant.getPrevNodes().Clear();
+                    ant.setCurrentNode(holeNode);
+                    ant.isWaiting = false;
+                }
+
+                antAtHomeCount = 0;
+            }
+        }
+
 
 		elapsedTime += Time.deltaTime;
 	}
@@ -144,12 +174,18 @@ public class GameManager : MonoBehaviour {
         }
     }
 
+    public void reachHome()
+    {
+        antAtHomeCount++;
+    }
+
     public void spawnAnt()
     {
         GameObject newAnt = Instantiate(antPrefab, holeNode.getPosition(), Quaternion.identity) as GameObject;
         AntController antCtrl = newAnt.GetComponent<AntController>();
         antCtrl.setCurrentNode(holeNode);
         antList.Add(antCtrl);
+        antAtHomeCount++;
     }
 
     public void removeAnt(int number)
@@ -163,6 +199,7 @@ public class GameManager : MonoBehaviour {
                 
                 AntController antCtrl = antList[i];
                 antList.RemoveAt(i);
+                if (antCtrl.getCurrentNode().getNodeId() == 0) antAtHomeCount--;
                 Destroy(antCtrl.gameObject);
             }
         }

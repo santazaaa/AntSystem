@@ -65,6 +65,23 @@ public class LogicManager : MonoBehaviour {
         return Q / distance;
     }
 
+    public void addDeltaPheromoneToPaths(List<Node> prevNodes)
+    {
+        float distance = getTotalDistance(prevNodes);
+        // Add delta T to tour path only
+        for (int i = 0; i < prevNodes.Count - 1; i++)
+        {
+            Node nodeI = prevNodes[i];
+            Node nodeJ = prevNodes[i + 1];
+
+            float deltaT = getPheromoneUpdate(distance);
+
+            Path path = gameManager.getPath(nodeI.getNodeId(), nodeJ.getNodeId());
+
+            path.addDeltaPheromone(deltaT);
+        }
+    }
+
     public void pheromoneDecay(List<Node> nodeList)
     {
         float distance = getTotalDistance(nodeList);
