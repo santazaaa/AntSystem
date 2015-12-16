@@ -6,6 +6,9 @@ public class LoadLevelManager : MonoBehaviour {
 
 //	private ScreenFadeInOut screen;
 	public GameObject Image;
+	public GameObject button;
+	public AudioClip clickButon;
+
 	bool isLoading;
 
 	void Start(){
@@ -29,6 +32,7 @@ public class LoadLevelManager : MonoBehaviour {
 	IEnumerator loadLevel(string levelName)
 	{
 		isLoading = true;
+		gameObject.GetComponent<AudioSource> ().PlayOneShot (clickButon);
 		yield return new WaitForSeconds (1.0f);
 		Application.LoadLevel (levelName);
 	}
